@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model BusOperator {
+  id             String         @id @default(cuid())
+  name           String
+  refundPolicies RefundPolicy[]
+  bookings       Booking[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model RefundPolicy {
+  id           String      @id @default(cuid())
+  operatorId   String
+  operator     BusOperator @relation(fields: [operatorId], references: [id])
+  rules        Json        // Stores the logic for refund calculations
+  version      Int         @default(1)
+  isCurrent    Boolean     @default(true)
+  bookings     Booking[]   // Policies applied to these bookings
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Booking {
+  id                String              @id @default(cuid())
+  userId            String
+  user              User                @relation(fields: [userId], references: [id])
+  operatorId        String
+  operator          BusOperator         @relation(fields: [operatorId], references: [id])
+  policyId          String
+  policy            RefundPolicy        @relation(fields: [policyId], references: [id])
+  amount            Float
+  status            BookingStatus       @default(CONFIRMED)
+  refundTransaction RefundTransaction?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+model RefundTransaction {
+  id             String       @id @default(cuid())
+  bookingId      String       @unique
+  booking        Booking      @relation(fields: [bookingId], references: [id])
+  refundAmount   Float
+  deductionTotal Float
+  breakdown      Json         // Detailed deduction breakdown
+  status         RefundStatus @default(INITIATED)
+  timeline       Json         // Amazon-style timeline events
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum RefundStatus {
+  INITIATED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
