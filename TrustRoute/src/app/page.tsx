@@ -42,7 +42,7 @@ export default function Home() {
 
       {/* Background Decor */}
       <div className="fixed inset-0 -z-10 pointer-events-none opacity-30">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#A3FF00] rounded-full blur-[160px] opacity-10" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-brand rounded-full blur-[160px] opacity-10" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-gray-200 rounded-full blur-[160px] opacity-20" />
       </div>
     </main>

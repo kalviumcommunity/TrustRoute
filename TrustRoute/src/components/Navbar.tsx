@@ -50,13 +50,13 @@ const Navbar: React.FC = () => {
 
                 <div className="flex items-center gap-1 ml-auto">
                     <a
-                        href="#login"
+                        href="login"
                         className="text-[10px] font-black uppercase tracking-widest px-4 py-3 text-white/60 hover:text-[#A3FF00] transition-colors"
                     >
                         Log In
                     </a>
                     <a
-                        href="#signup"
+                        href="signup"
                         className="text-[10px] font-black uppercase tracking-widest px-6 py-3 bg-[#A3FF00] text-black rounded-full hover:bg-white transition-all shadow-xl shadow-[#A3FF00]/10"
                     >
                         Start Now
