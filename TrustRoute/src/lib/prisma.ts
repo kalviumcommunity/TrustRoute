@@ -1,7 +1,13 @@
 import { PrismaClient } from '@prisma/client'
+// Force recompile to clear stale Turbopack cache - v2
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 
 const prismaClientSingleton = () => {
-  return new PrismaClient()
+  const connectionString = `${process.env.DATABASE_URL}`
+  const pool = new Pool({ connectionString })
+  const adapter = new PrismaPg(pool)
+  return new PrismaClient({ adapter })
 }
 
 declare global {

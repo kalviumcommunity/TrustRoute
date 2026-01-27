@@ -1,75 +1,125 @@
+'use client';
 
-"use client";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { login } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    // Check if already authenticated
-    fetch("/api/auth/session").then(async (res) => {
-      const data = await res.json();
-      if (data.authenticated) {
-        router.replace("/");
-      }
-    });
-  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-      setError("Invalid email address");
-      return;
-    }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
+    setError('');
     setLoading(true);
+
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
+
       const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Login failed");
+
+      if (res.ok) {
+        login(data.user);
+        router.push('/dashboard');
       } else {
-        setSuccess("Login successful!");
-        setTimeout(() => router.replace("/"), 1000);
+        setError(data.error || 'Login failed');
       }
     } catch (err) {
-      setError("Something went wrong");
+      setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-md space-y-6">
-        <h1 className="text-2xl font-bold text-center">Login</h1>
-        {error && <div className="text-red-600 text-center">{error}</div>}
-        {success && <div className="text-green-600 text-center">{success}</div>}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-          <input type="email" id="email" name="email" required value={email} onChange={e => setEmail(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    <div className="min-h-screen bg-black flex items-center justify-center p-6 selection:bg-[#A3FF00] selection:text-black font-inter">
+      <div className="w-full max-w-md">
+        {/* Logo/Header */}
+        <div className="text-center mb-12">
+          <Link href="/" className="inline-flex items-center gap-3 group">
+            <div className="w-10 h-10 bg-[#A3FF00] rounded-xl rotate-12 flex items-center justify-center border-2 border-black group-hover:rotate-0 transition-transform duration-500">
+              <div className="w-3 h-3 bg-black rounded-full" />
+            </div>
+            <span className="text-2xl font-black tracking-tighter text-[#A3FF00] uppercase italic">TrustRoute</span>
+          </Link>
+          <h1 className="mt-8 text-4xl font-black text-white tracking-tight uppercase italic underline decoration-[#A3FF00] decoration-4 underline-offset-8">
+            Welcome Back
+          </h1>
+          <p className="mt-4 text-white/40 text-sm font-medium uppercase tracking-widest">
+            Enter your credentials to continue
+          </p>
         </div>
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-          <input type="password" id="password" name="password" required value={password} onChange={e => setPassword(e.target.value)} className="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+        {/* Form Container */}
+        <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem] backdrop-blur-xl shadow-2xl relative overflow-hidden group">
+          {/* Decorative Gradient */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-[#A3FF00]/10 blur-[60px] rounded-full -mr-16 -mt-16 pointer-events-none" />
+
+          <form onSubmit={handleSubmit} className="space-y-6 relative">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-500 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest text-center">
+                {error}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 ml-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-black/50 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#A3FF00] focus:ring-1 focus:ring-[#A3FF00] transition-all placeholder:text-white/10 text-sm font-medium"
+                placeholder="name@company.com"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 ml-1 flex justify-between">
+                <span>Password</span>
+                <a href="#" className="text-[#A3FF00]/40 hover:text-[#A3FF00] transition-colors">Forgot?</a>
+              </label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-black/50 border border-white/10 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-[#A3FF00] focus:ring-1 focus:ring-[#A3FF00] transition-all placeholder:text-white/10 text-sm font-medium"
+                placeholder="••••••••"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#A3FF00] text-black font-black uppercase tracking-[0.15em] py-5 rounded-2xl hover:bg-white transition-all transform active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-[#A3FF00]/10 mt-4 text-sm"
+            >
+              {loading ? 'Authenticating...' : 'Sign In Now'}
+            </button>
+          </form>
         </div>
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition" disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
-      </form>
-    </main>
+
+        {/* Footer */}
+        <p className="mt-8 text-center text-white/30 text-[10px] font-black uppercase tracking-[0.2em]">
+          New to the route?{' '}
+          <Link href="/signup" className="text-[#A3FF00] hover:underline underline-offset-4 decoration-2">
+            Create an Account
+          </Link>
+        </p>
+      </div>
+    </div>
   );
-}
+};
+
+export default LoginPage;

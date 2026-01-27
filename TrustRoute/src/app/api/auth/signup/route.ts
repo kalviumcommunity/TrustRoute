@@ -1,26 +1,52 @@
-import { NextRequest, NextResponse } from "next/server";
-import { hash } from "bcryptjs";
-import prisma from "@/lib/prisma";
+import { NextResponse } from 'next/server';
+import prisma from '@/lib/prisma';
+import { hashPassword } from '@/lib/auth';
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { email, password, name } = await req.json();
+
     if (!email || !password) {
-      return NextResponse.json({ error: "Email and password required" }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Email and password are required' },
+        { status: 400 }
+      );
     }
-    // Check if user exists
-    const existing = await prisma.user.findUnique({ where: { email } });
-    if (existing) {
-      return NextResponse.json({ error: "User already exists" }, { status: 409 });
-    }
-    // Hash password
-    const passwordHash = await hash(password, 10);
-    // Create user
-    const user = await prisma.user.create({
-      data: { email, passwordHash },
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
     });
-    return NextResponse.json({ id: user.id, email: user.email });
-  } catch (e) {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: 'User already exists' },
+        { status: 400 }
+      );
+    }
+
+    // Hash password and create user
+    const hashedPassword = await hashPassword(password);
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        name,
+      },
+    });
+
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = user;
+
+    return NextResponse.json(
+      { message: 'User created successfully', user: userWithoutPassword },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Signup error:', error);
+    return NextResponse.json(
+      { error: 'An error occurred during signup' },
+      { status: 500 }
+    );
   }
 }
