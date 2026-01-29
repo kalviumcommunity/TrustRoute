@@ -3,6 +3,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        DATABASE_URL: postgresql://user:password@postgres:5432/trustroute?schema=public
+        REDIS_URL: redis://redis:6379
     ports:
       - "3000:3000"
     environment:
