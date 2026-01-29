@@ -21,6 +21,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+ARG REDIS_URL
+ENV REDIS_URL=${REDIS_URL}
+
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
