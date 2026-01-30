@@ -136,6 +136,28 @@ export default function SeatSelector({ onSelect, onCancel, busName, price }: Sea
                                     <span className="font-bold">Pro Tip:</span> Yellow dots indicate seats with better views and extra legroom!
                                 </p>
                             </div>
+
+                            <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Refund Policy Preview</label>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-[11px]">
+                                        <span className="text-gray-500">{'>'}24 hrs</span>
+                                        <span className="font-bold text-green-600">₹{(price * 0.95).toFixed(0)} back</span>
+                                    </div>
+                                    <div className="flex justify-between text-[11px]">
+                                        <span className="text-gray-500">12-24 hrs</span>
+                                        <span className="font-bold text-yellow-600">₹{(price * 0.75).toFixed(0)} back</span>
+                                    </div>
+                                    <div className="flex justify-between text-[11px]">
+                                        <span className="text-gray-500">3-12 hrs</span>
+                                        <span className="font-bold text-orange-600">₹{(price * 0.50).toFixed(0)} back</span>
+                                    </div>
+                                </div>
+                                <label className="mt-4 flex items-center gap-2 cursor-pointer group">
+                                    <input type="checkbox" required className="rounded border-gray-300 text-brand focus:ring-brand" />
+                                    <span className="text-[10px] text-gray-500 font-medium group-hover:text-gray-700">I acknowledge the refund policy rules</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
 
