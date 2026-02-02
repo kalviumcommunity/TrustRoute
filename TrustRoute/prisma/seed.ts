@@ -57,6 +57,58 @@ async function main() {
                 },
             },
         },
+        {
+            name: 'NightRider',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: '95% refund before 24h, 50% refund before 6h',
+                        reschedule: 'Allowed with 5% fee up to 4h before',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
+        {
+            name: 'CityLink Express',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: '80% refund if cancelled 24h early',
+                        reschedule: 'Allowed with 15% fee up to 8h before',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
+        {
+            name: 'Royal Coaches',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: '90% refund before 12h, 40% refund before 3h',
+                        reschedule: 'Allowed with 20% fee up to 2h before',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
+        {
+            name: 'MetroWay',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: '85% refund before 24h, 30% refund before 6h',
+                        reschedule: 'Allowed with 10% fee up to 5h before',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
     ];
 
     for (const op of operators) {

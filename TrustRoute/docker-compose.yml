@@ -1,4 +1,19 @@
 services:
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+      args:
+        DATABASE_URL: postgresql://user:password@postgres:5432/trustroute?schema=public
+        REDIS_URL: redis://redis:6379
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/trustroute?schema=public
+    command: npx prisma migrate deploy
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   backend:
     build:
       context: .
@@ -12,6 +27,8 @@ services:
       - DATABASE_URL=postgresql://user:password@postgres:5432/trustroute?schema=public
       - REDIS_URL=redis://redis:6379
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
       redis:
