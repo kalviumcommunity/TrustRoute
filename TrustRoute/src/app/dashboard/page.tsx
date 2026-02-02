@@ -128,6 +128,8 @@ export default function DashboardPage() {
                     seatNumber: activeBooking.seatNumber,
                     passengerName: activeBooking.passengerName,
                     travelDate: activeBooking.travelDate,
+                    route: `${searchValues.from} → ${searchValues.to}`,
+                    departureTime: activeBooking.departure,
                 }),
             });
             const data = await res.json();

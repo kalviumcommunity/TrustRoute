@@ -57,6 +57,18 @@ const Navbar: React.FC = () => {
                 <div className="flex items-center gap-1 ml-auto">
                     {user ? (
                         <>
+                            <Link
+                                href="/dashboard/bookings"
+                                className="text-[10px] font-black uppercase tracking-widest px-4 py-3 text-white/60 hover:text-[#A3FF00] transition-colors"
+                            >
+                                My Bookings
+                            </Link>
+                            <Link
+                                href="/dashboard"
+                                className="text-[10px] font-black uppercase tracking-widest px-4 py-3 text-white/60 hover:text-[#A3FF00] transition-colors"
+                            >
+                                Dashboard
+                            </Link>
                             <span className="text-[10px] font-black uppercase tracking-widest px-4 py-3 text-white/40">
                                 {user.name || user.email.split('@')[0]}
                             </span>

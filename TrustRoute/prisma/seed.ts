@@ -31,9 +31,97 @@ async function main() {
     console.log('Seeding data with TrustRoute Refund Policies...');
 
     const operators = [
-        { name: 'FastTrack Travels' },
-        { name: 'StarBus' },
-        { name: 'GreenLine' },
+        {
+            name: 'FastTrack Travels',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: 'Full refund before 24h, 50% refund before 12h',
+                        reschedule: 'Allowed with 10% fee up to 6h before',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
+        {
+            name: 'StarBus',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: 'No refund within 24h of departure',
+                        reschedule: 'Not allowed for promotional tickets',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
+        {
+            name: 'GreenLine',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: '75% refund if cancelled 48h early',
+                        reschedule: 'Unlimited rescheduling for Silver members',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
+        {
+            name: 'NightRider',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: '95% refund before 24h, 50% refund before 6h',
+                        reschedule: 'Allowed with 5% fee up to 4h before',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
+        {
+            name: 'CityLink Express',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: '80% refund if cancelled 24h early',
+                        reschedule: 'Allowed with 15% fee up to 8h before',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
+        {
+            name: 'Royal Coaches',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: '90% refund before 12h, 40% refund before 3h',
+                        reschedule: 'Allowed with 20% fee up to 2h before',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
+        {
+            name: 'MetroWay',
+            policies: {
+                create: {
+                    rules: {
+                        cancellation: '85% refund before 24h, 30% refund before 6h',
+                        reschedule: 'Allowed with 10% fee up to 5h before',
+                    },
+                    version: 1,
+                    isCurrent: true,
+                },
+            },
+        },
     ];
 
     for (const op of operators) {

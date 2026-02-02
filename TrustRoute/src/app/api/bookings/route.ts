@@ -61,7 +61,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { operatorId, policyId, amount, seatNumber, passengerName, travelDate } = await request.json();
+        const { operatorId, policyId, amount, seatNumber, passengerName, travelDate, route, departureTime } = await request.json();
 
         if (!operatorId || !policyId || !amount) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -77,6 +77,8 @@ export async function POST(request: Request) {
                 seatNumber,
                 passengerName,
                 travelDate: travelDate ? new Date(travelDate) : null,
+                route,
+                departureTime,
             },
         });
 
