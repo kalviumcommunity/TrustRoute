@@ -18,6 +18,14 @@ interface Booking {
     travelDate?: string;
     operator: { name: string };
     policy: { rules: any };
+    refundTransaction?: {
+        id: string;
+        refundAmount: number;
+        deductionTotal: number;
+        breakdown: any;
+        status: string;
+        timeline: any[];
+    };
 }
 
 interface BusResult {
@@ -47,7 +55,10 @@ export default function DashboardPage() {
     const [showSeatSelector, setShowSeatSelector] = useState(false);
     const [showPayment, setShowPayment] = useState(false);
     const [showTicket, setShowTicket] = useState(false);
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [showRefundReceipt, setShowRefundReceipt] = useState(false);
     const [activeBooking, setActiveBooking] = useState<any>(null);
+    const [cancellingId, setCancellingId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchBookings();
@@ -136,6 +147,30 @@ export default function DashboardPage() {
         } catch (error) {
             console.error('Booking failed', error);
             setMessage({ type: 'error', text: 'Booking failed. Please try again.' });
+        } finally {
+            setBookingLoading(false);
+            setTimeout(() => setMessage(null), 5000);
+        }
+    };
+
+    const handleCancelBooking = async (bookingId: string) => {
+        setBookingLoading(true);
+        try {
+            const res = await fetch(`/api/bookings/${bookingId}/cancel`, {
+                method: 'POST',
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setMessage({ type: 'success', text: 'Booking cancelled. Refund initiated.' });
+                fetchBookings();
+                setShowCancelConfirm(false);
+                setCancellingId(null);
+            } else {
+                setMessage({ type: 'error', text: data.error || 'Cancellation failed' });
+            }
+        } catch (error) {
+            console.error('Cancellation failed', error);
+            setMessage({ type: 'error', text: 'Something went wrong.' });
         } finally {
             setBookingLoading(false);
             setTimeout(() => setMessage(null), 5000);
@@ -247,6 +282,103 @@ export default function DashboardPage() {
                         setSelectedBus(null);
                     }}
                 />
+            )}
+
+            {showCancelConfirm && cancellingId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-8">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4 font-serif italic">Cancel Trip?</h2>
+                        <div className="space-y-4 mb-8">
+                            <p className="text-gray-500 text-sm leading-relaxed">
+                                Are you sure you want to cancel your journey? Refunds are calculated strictly based on TrustRoute's policy.
+                            </p>
+                            <div className="p-4 bg-orange-50 border border-orange-100 rounded-2xl">
+                                <p className="text-xs font-bold text-orange-800 uppercase mb-2">Refund Estimate</p>
+                                <div className="flex justify-between items-center mb-1">
+                                    <span className="text-sm font-medium text-orange-700">Estimated Refund</span>
+                                    <span className="font-bold text-orange-900 text-xl font-serif">₹{(() => {
+                                        const b = bookings.find(b => b.id === cancellingId);
+                                        if (!b) return 0;
+                                        const diff = (new Date(b.travelDate || b.createdAt).getTime() - new Date().getTime()) / (1000 * 3600);
+                                        if (diff >= 24) return (b.amount * 0.95).toFixed(0);
+                                        if (diff >= 12) return (b.amount * 0.75).toFixed(0);
+                                        if (diff >= 3) return (b.amount * 0.50).toFixed(0);
+                                        return 0;
+                                    })()}</span>
+                                </div>
+                                <p className="text-[10px] text-orange-600 font-medium">*Final calculation at time of initiation</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-4">
+                            <button onClick={() => setShowCancelConfirm(false)} className="flex-1 py-4 text-gray-400 font-bold">Nevermind</button>
+                            <button
+                                onClick={() => handleCancelBooking(cancellingId)}
+                                disabled={bookingLoading}
+                                className="flex-1 bg-red-500 text-white py-4 rounded-2xl font-bold hover:bg-red-600 transition-all shadow-lg flex items-center justify-center"
+                            >
+                                {bookingLoading ? <Loader2 className="animate-spin" size={20} /> : 'Confirm Cancel'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showRefundReceipt && activeBooking && activeBooking.refundTransaction && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                    <div className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-8 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-opacity-5">
+                        <div className="border-b-2 border-dashed border-gray-100 pb-6 mb-6 text-center">
+                            <h2 className="text-xl font-bold text-gray-900 font-serif italic mb-1">Refund Receipt</h2>
+                            <p className="text-xs text-gray-400 font-mono uppercase tracking-widest">{activeBooking.refundTransaction.id}</p>
+                        </div>
+                        <div className="space-y-4 mb-8">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-500">Ticket ID</span>
+                                <span className="font-bold text-gray-900 uppercase">{activeBooking.id.slice(0, 8)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-500">Original Amount</span>
+                                <span className="font-bold text-gray-900">₹{activeBooking.amount}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                                <span className="text-gray-500">Deductions</span>
+                                <span className="font-bold text-red-500">-₹{activeBooking.refundTransaction.deductionTotal}</span>
+                            </div>
+                            <div className="p-3 bg-gray-50 rounded-xl space-y-2 text-[11px]">
+                                <p className="text-gray-400 font-bold uppercase tracking-widest text-[9px]">Deduction Reason</p>
+                                <div className="flex justify-between">
+                                    <span>{activeBooking.refundTransaction.breakdown.appliedSlab}</span>
+                                    <span>₹{activeBooking.refundTransaction.breakdown.deductions.convenience + activeBooking.refundTransaction.breakdown.deductions.cancellation}</span>
+                                </div>
+                            </div>
+                            <div className="flex justify-between items-center py-4 border-t border-gray-100">
+                                <span className="font-bold text-gray-900">Total Refund</span>
+                                <span className="text-2xl font-bold text-green-600">₹{activeBooking.refundTransaction.refundAmount}</span>
+                            </div>
+                            <div className="p-4 bg-green-50 rounded-2xl border border-green-100 flex items-center gap-3">
+                                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                                <span className="text-xs font-bold text-green-700 uppercase">Status: {activeBooking.refundTransaction.status}</span>
+                            </div>
+                        </div>
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => {
+                                    const refund = activeBooking.refundTransaction;
+                                    const content = `TRUSTROUTE REFUND RECEIPT\n==========================\nRefund ID: ${refund.id}\nBooking ID: ${activeBooking.id}\nDate: ${new Date().toLocaleString()}\n\nOriginal Amount: ₹${activeBooking.amount}\nRefund Amount: ₹${refund.refundAmount}\nDeductions: ₹${refund.deductionTotal}\nReason: ${refund.breakdown.appliedSlab}\n\nStatus: ${refund.status}\n==========================\nThank you for choosing TrustRoute.`;
+                                    const blob = new Blob([content], { type: 'text/plain' });
+                                    const url = URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = `refund_${activeBooking.id.slice(0, 8)}.txt`;
+                                    a.click();
+                                }}
+                                className="flex-1 bg-brand text-black py-4 rounded-xl font-bold hover:bg-black hover:text-brand transition-all flex items-center justify-center gap-2"
+                            >
+                                <History size={20} /> Download
+                            </button>
+                            <button onClick={() => setShowRefundReceipt(false)} className="flex-1 bg-black text-white py-4 rounded-xl font-bold">Done</button>
+                        </div>
+                    </div>
+                </div>
             )}
 
             {/* Main Content */}
@@ -420,6 +552,34 @@ export default function DashboardPage() {
                                         </div>
                                     )}
 
+                                    {booking.status === 'CANCELLED' && booking.refundTransaction && (
+                                        <div className="mb-6 p-4 bg-gray-100/50 rounded-2xl border border-gray-100">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Refund Progress</p>
+                                                <span className={`text-[10px] font-bold uppercase ${booking.refundTransaction.status === 'COMPLETED' ? 'text-green-600' : 'text-orange-500'}`}>
+                                                    {booking.refundTransaction.status}
+                                                </span>
+                                            </div>
+                                            <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                                                <div
+                                                    className={`h-full bg-brand transition-all duration-1000 ${booking.refundTransaction.status === 'INITIATED' ? 'w-1/3' :
+                                                        booking.refundTransaction.status === 'PROCESSING' ? 'w-2/3' :
+                                                            'w-full'
+                                                        }`}
+                                                />
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    setActiveBooking(booking);
+                                                    setShowRefundReceipt(true);
+                                                }}
+                                                className="mt-3 text-[10px] font-bold text-brand hover:underline flex items-center gap-1"
+                                            >
+                                                <History size={12} /> View Refund Receipt
+                                            </button>
+                                        </div>
+                                    )}
+
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <Calendar size={14} className="text-gray-400" />
@@ -427,9 +587,35 @@ export default function DashboardPage() {
                                                 {booking.travelDate ? new Date(booking.travelDate).toLocaleDateString() : new Date(booking.createdAt).toLocaleDateString()}
                                             </span>
                                         </div>
-                                        <button className="text-xs font-bold bg-black text-white px-5 py-2.5 rounded-xl hover:bg-brand hover:text-black transition-all shadow-md">
-                                            View Ticket
-                                        </button>
+                                        <div className="flex gap-2">
+                                            {booking.status === 'CONFIRMED' && (
+                                                <button
+                                                    onClick={() => {
+                                                        setCancellingId(booking.id);
+                                                        setShowCancelConfirm(true);
+                                                    }}
+                                                    className="text-xs font-bold text-red-500 hover:text-red-600 px-4 py-2 transition-all"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            )}
+                                            <button
+                                                onClick={() => {
+                                                    setActiveBooking({
+                                                        ...booking,
+                                                        busName: 'Express Journey',
+                                                        from: 'Search',
+                                                        to: 'Destination',
+                                                        date: booking.travelDate || booking.createdAt,
+                                                        departure: '9:00 AM' // Mock for history
+                                                    });
+                                                    setShowTicket(true);
+                                                }}
+                                                className="text-xs font-bold bg-black text-white px-5 py-2.5 rounded-xl hover:bg-brand hover:text-black transition-all shadow-md"
+                                            >
+                                                View Ticket
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
