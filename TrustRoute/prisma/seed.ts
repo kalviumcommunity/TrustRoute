@@ -124,6 +124,8 @@ async function main() {
         },
     ];
 
+    const createdOperators = [];
+    
     for (const op of operators) {
         const created = await prisma.busOperator.create({
             data: {
@@ -136,11 +138,61 @@ async function main() {
                     },
                 },
             },
+            include: {
+                refundPolicies: true,
+            },
         });
+        createdOperators.push(created);
         console.log(`Created operator: ${created.name} with TrustRoute policy.`);
     }
 
-    console.log('Seeding complete!');
+    // Add sample bus routes
+    console.log('\nAdding sample bus routes...');
+    
+    const routes = [
+        { from: 'New York', to: 'Boston', distance: 215, duration: '3h 45m', price: 45 },
+        { from: 'New York', to: 'Philadelphia', distance: 95, duration: '2h 15m', price: 35 },
+        { from: 'Boston', to: 'Philadelphia', distance: 310, duration: '5h 30m', price: 55 },
+        { from: 'New York', to: 'Washington DC', distance: 225, duration: '4h 00m', price: 50 },
+        { from: 'Philadelphia', to: 'Washington DC', distance: 140, duration: '2h 45m', price: 40 },
+        { from: 'Boston', to: 'Washington DC', distance: 435, duration: '7h 15m', price: 75 },
+    ];
+
+    // Create sample bookings for future dates
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+
+    for (let i = 0; i < routes.length; i++) {
+        const route = routes[i];
+        const operator = createdOperators[i % createdOperators.length];
+        const policy = operator.refundPolicies[0];
+        
+        // Create 2 bookings per route (tomorrow and next week)
+        for (let j = 0; j < 2; j++) {
+            const travelDate = j === 0 ? tomorrow : nextWeek;
+            const hour = 8 + (j * 6); // 8 AM and 2 PM
+            
+            await prisma.booking.create({
+                data: {
+                    userId: 'demo-user-id', // This is just placeholder, no real user yet
+                    operatorId: operator.id,
+                    policyId: policy.id,
+                    amount: route.price,
+                    status: 'CONFIRMED',
+                    seatNumber: `${String.fromCharCode(65 + (i % 26))}${j + 1}`, // A1, A2, B1, B2, etc.
+                    passengerName: `Sample Passenger ${i + 1}`,
+                    route: `${route.from} → ${route.to}`,
+                    travelDate: travelDate,
+                    departureTime: `${hour}:00 AM`,
+                },
+            });
+        }
+    }
+
+    console.log('✅ Seeding complete! Added 6 bus routes with 2 schedules each.');
 }
 
 main()
