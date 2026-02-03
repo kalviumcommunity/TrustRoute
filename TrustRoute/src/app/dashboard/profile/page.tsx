@@ -3,170 +3,403 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { User, Settings, LogOut, ArrowLeft, Mail, Calendar } from 'lucide-react';
-
-interface UserProfile {
-    id: string;
-    email: string;
-    name: string | null;
-    createdAt: string;
-}
+import { User, Settings, LogOut, ArrowLeft, Mail, Calendar, Phone, Edit2, Lock, Save, X, CheckCircle2, AlertCircle, Loader2, Bus, History } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function ProfilePage() {
     const router = useRouter();
-    const [user, setUser] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { user, loading: authLoading, refreshUser } = useAuth();
+
+    // UI States
+    const [activeTab, setActiveTab] = useState<'overview' | 'edit' | 'security'>('overview');
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Form States
+    const [formData, setFormData] = useState({
+        name: '',
+        phoneNumber: '',
+    });
+
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+    });
 
     useEffect(() => {
-        fetchUserProfile();
-    }, []);
+        if (user) {
+            setFormData({
+                name: user.name || '',
+                phoneNumber: user.phoneNumber || '',
+            });
+        }
+    }, [user]);
 
-    const fetchUserProfile = async () => {
+    const handleProfileUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setMessage(null);
+
         try {
-            const response = await fetch('/api/auth/me');
-            if (response.ok) {
-                const data = await response.json();
-                setUser(data.user);
+            const res = await fetch('/api/user/profile', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                setMessage({ type: 'success', text: 'Profile updated successfully!' });
+                await refreshUser();
+                setTimeout(() => setActiveTab('overview'), 1500); // Switch back after success
             } else {
-                router.push('/login');
+                setMessage({ type: 'error', text: data.error || 'Failed to update profile' });
             }
         } catch (error) {
-            console.error('Failed to fetch user profile:', error);
+            setMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
         } finally {
-            setLoading(false);
+            setIsSubmitting(false);
+        }
+    };
+
+    const handlePasswordChange = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setMessage(null);
+
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setMessage({ type: 'error', text: 'New passwords do not match' });
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const res = await fetch('/api/user/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword,
+                }),
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                setMessage({ type: 'success', text: 'Password changed successfully!' });
+                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            } else {
+                setMessage({ type: 'error', text: data.error || 'Failed to change password' });
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const handleLogout = async () => {
         try {
-            await fetch('/api/auth/session', { method: 'DELETE' });
+            await fetch('/api/auth/me', { method: 'POST' }); // Using the logout endpoint in me/route.ts
             router.push('/login');
         } catch (error) {
             console.error('Logout error:', error);
         }
     };
 
-    if (loading) {
+    if (authLoading) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-brand animate-spin" />
             </div>
         );
     }
 
+    if (!user) {
+        // Should be redirected by middleware or AuthContext, but just in case
+        return null;
+    }
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Header */}
-                <div className="mb-8">
-                    <Link 
-                        href="/dashboard" 
-                        className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
-                    >
-                        <ArrowLeft className="w-4 h-4" />
-                        Back to Dashboard
-                    </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
+        <div className="min-h-screen bg-gray-50/30 font-inter">
+            {/* Decorative Background */}
+            <div className="fixed inset-0 -z-10 pointer-events-none opacity-30">
+                <div className="absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-brand rounded-full blur-[140px] opacity-10" />
+                <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-200 rounded-full blur-[140px] opacity-10" />
+            </div>
+
+            {/* Sidebar (Consistency with Dashboard) */}
+            <aside className="hidden md:flex w-64 bg-white/80 border-r border-gray-200 flex-col p-6 shadow-sm min-h-screen fixed top-0 left-0 z-20 backdrop-blur-xl">
+                <div className="mb-10">
+                    <h2 className="text-2xl font-bold text-brand italic font-serif tracking-tight">TrustRoute</h2>
                 </div>
+                <nav className="flex flex-col gap-2">
+                    <Link href="/dashboard" className="flex items-center gap-3 text-gray-500 hover:bg-gray-100 font-medium rounded-xl px-4 py-3 transition-all">
+                        <Bus size={20} /> Dashboard
+                    </Link>
+                    <Link href="/dashboard/bookings" className="flex items-center gap-3 text-gray-500 hover:bg-gray-100 font-medium rounded-xl px-4 py-3 transition-all">
+                        <History size={20} /> My Bookings
+                    </Link>
+                    <Link href="/dashboard/profile" className="flex items-center gap-3 bg-brand/10 text-brand font-semibold rounded-xl px-4 py-3 transition-all">
+                        <Settings size={20} /> Profile
+                    </Link>
+                </nav>
+                <div className="mt-auto pt-10">
+                    <Link href="/" className="text-gray-400 hover:text-brand text-xs uppercase font-bold tracking-widest flex items-center gap-2">
+                        ← Return Home
+                    </Link>
+                </div>
+            </aside>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Sidebar */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                            <div className="flex flex-col items-center text-center">
-                                <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mb-4">
-                                    <User className="w-12 h-12 text-white" />
-                                </div>
-                                <h2 className="text-xl font-bold text-gray-900 mb-1">
-                                    {user?.name || 'User'}
-                                </h2>
-                                <p className="text-gray-500 text-sm">{user?.email}</p>
+            <div className="md:ml-64 p-8">
+                {/* Header */}
+                <header className="flex items-center justify-between mb-8 pt-4">
+                    <div>
+                        <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Account Settings</h1>
+                        <p className="text-gray-500">Manage your personal information and security.</p>
+                    </div>
+                </header>
+
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {/* User Summary Card */}
+                    <div className="lg:col-span-4">
+                        <div className="bg-white rounded-[2rem] shadow-sm border border-gray-200 p-8 text-center sticky top-8">
+                            <div className="w-32 h-32 bg-brand/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand font-bold text-4xl border-4 border-white shadow-lg">
+                                {user.name ? user.name[0].toUpperCase() : 'U'}
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-1">{user.name || 'User'}</h2>
+                            <p className="text-gray-500 text-sm mb-6">{user.email}</p>
+
+                            <div className="flex justify-center gap-2 mb-8">
+                                <span className="px-4 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-bold border border-green-100">
+                                    Verified Account
+                                </span>
                             </div>
 
-                            <div className="mt-6 pt-6 border-t border-gray-200">
-                                <Link
-                                    href="/dashboard"
-                                    className="flex items-center gap-3 text-gray-700 hover:bg-gray-50 rounded-xl px-4 py-3 mb-2 transition-all"
-                                >
-                                    <Settings className="w-5 h-5" />
-                                    <span className="font-medium">Dashboard</span>
-                                </Link>
-                                <Link
-                                    href="/dashboard/bookings"
-                                    className="flex items-center gap-3 text-gray-700 hover:bg-gray-50 rounded-xl px-4 py-3 mb-2 transition-all"
-                                >
-                                    <Calendar className="w-5 h-5" />
-                                    <span className="font-medium">My Bookings</span>
-                                </Link>
-                                <button
-                                    onClick={handleLogout}
-                                    className="w-full flex items-center gap-3 text-red-600 hover:bg-red-50 rounded-xl px-4 py-3 transition-all"
-                                >
-                                    <LogOut className="w-5 h-5" />
-                                    <span className="font-medium">Logout</span>
-                                </button>
-                            </div>
+                            <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center justify-center gap-2 text-red-600 hover:bg-red-50 rounded-xl px-4 py-3 transition-all font-bold text-sm border border-transparent hover:border-red-100"
+                            >
+                                <LogOut size={18} />
+                                Sign Out
+                            </button>
                         </div>
                     </div>
 
-                    {/* Main Content */}
-                    <div className="lg:col-span-2">
-                        <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-200">
-                            <h3 className="text-lg font-bold text-gray-900 mb-6">Account Information</h3>
-                            
-                            <div className="space-y-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Full Name
-                                    </label>
-                                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                                        <User className="w-5 h-5 text-gray-400" />
-                                        <span className="text-gray-900">{user?.name || 'Not provided'}</span>
-                                    </div>
-                                </div>
+                    {/* Main Content Areas */}
+                    <div className="lg:col-span-8">
+                        {/* Tab Navigation */}
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-2 mb-8 flex gap-2">
+                            <button
+                                onClick={() => setActiveTab('overview')}
+                                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'overview' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+                                    }`}
+                            >
+                                <User size={18} /> Overview
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('edit')}
+                                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'edit' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+                                    }`}
+                            >
+                                <Edit2 size={18} /> Edit Profile
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('security')}
+                                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'security' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+                                    }`}
+                            >
+                                <Lock size={18} /> Security
+                            </button>
+                        </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Email Address
-                                    </label>
-                                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                                        <Mail className="w-5 h-5 text-gray-400" />
-                                        <span className="text-gray-900">{user?.email}</span>
-                                    </div>
-                                </div>
+                        {/* Status Messages */}
+                        {message && (
+                            <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-100' : 'bg-red-50 text-red-700 border border-red-100'
+                                }`}>
+                                {message.type === 'success' ? <CheckCircle2 size={20} /> : <AlertCircle size={20} />}
+                                <p className="font-medium text-sm">{message.text}</p>
+                            </div>
+                        )}
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Member Since
-                                    </label>
-                                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
-                                        <Calendar className="w-5 h-5 text-gray-400" />
-                                        <span className="text-gray-900">
-                                            {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                        {/* Overview Tab */}
+                        {activeTab === 'overview' && (
+                            <div className="bg-white rounded-[2rem] shadow-sm border border-gray-200 p-8 space-y-6 animate-in fade-in duration-300">
+                                <h3 className="text-xl font-bold text-gray-900 font-serif">Profile Details</h3>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="p-2 bg-white rounded-lg shadow-sm">
+                                                <User size={18} className="text-brand" />
+                                            </div>
+                                            <p className="text-xs font-bold text-gray-400 uppercase">Full Name</p>
+                                        </div>
+                                        <p className="text-gray-900 font-bold ml-1">{user.name || 'Not provided'}</p>
+                                    </div>
+
+                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="p-2 bg-white rounded-lg shadow-sm">
+                                                <Mail size={18} className="text-brand" />
+                                            </div>
+                                            <p className="text-xs font-bold text-gray-400 uppercase">Email Address</p>
+                                        </div>
+                                        <p className="text-gray-900 font-bold ml-1">{user.email}</p>
+                                    </div>
+
+                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="p-2 bg-white rounded-lg shadow-sm">
+                                                <Phone size={18} className="text-brand" />
+                                            </div>
+                                            <p className="text-xs font-bold text-gray-400 uppercase">Phone Number</p>
+                                        </div>
+                                        <p className="text-gray-900 font-bold ml-1">{user.phoneNumber || 'Not provided'}</p>
+                                    </div>
+
+                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="p-2 bg-white rounded-lg shadow-sm">
+                                                <Calendar size={18} className="text-brand" />
+                                            </div>
+                                            <p className="text-xs font-bold text-gray-400 uppercase">Member Since</p>
+                                        </div>
+                                        <p className="text-gray-900 font-bold ml-1">
+                                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
                                                 year: 'numeric',
                                                 month: 'long',
                                                 day: 'numeric'
                                             }) : 'Unknown'}
-                                        </span>
+                                        </p>
                                     </div>
                                 </div>
                             </div>
+                        )}
 
-                            <div className="mt-8 pt-8 border-t border-gray-200">
-                                <h4 className="text-sm font-medium text-gray-700 mb-4">Account Actions</h4>
-                                <div className="space-y-3">
-                                    <button className="w-full text-left px-4 py-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all font-medium">
-                                        Change Password
-                                    </button>
-                                    <button className="w-full text-left px-4 py-3 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 transition-all font-medium">
-                                        Update Profile
-                                    </button>
-                                    <button className="w-full text-left px-4 py-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all font-medium">
-                                        Delete Account
-                                    </button>
-                                </div>
+                        {/* Edit Tab */}
+                        {activeTab === 'edit' && (
+                            <div className="bg-white rounded-[2rem] shadow-sm border border-gray-200 p-8 animate-in fade-in duration-300">
+                                <h3 className="text-xl font-bold text-gray-900 font-serif mb-6">Update Information</h3>
+                                <form onSubmit={handleProfileUpdate} className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
+                                        <input
+                                            type="text"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            className="w-full p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input"
+                                            placeholder="Enter your name"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            value={formData.phoneNumber}
+                                            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                                            className="w-full p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input"
+                                            placeholder="Enter your phone number"
+                                            pattern="[0-9]{10}"
+                                            title="10 digit phone number"
+                                        />
+                                        <p className="text-xs text-gray-400 mt-2 ml-1">Must be a valid 10-digit number</p>
+                                    </div>
+
+                                    <div className="flex justify-end gap-3 pt-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setActiveTab('overview')}
+                                            className="px-6 py-3 text-gray-500 font-bold hover:bg-gray-50 rounded-xl transition-all"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className="bg-black text-white px-8 py-3 rounded-xl font-bold hover:bg-brand hover:text-black transition-all flex items-center gap-2 shadow-lg disabled:opacity-70"
+                                        >
+                                            {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Save size={18} />}
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
-                        </div>
+                        )}
+
+                        {/* Security Tab */}
+                        {activeTab === 'security' && (
+                            <div className="bg-white rounded-[2rem] shadow-sm border border-gray-200 p-8 animate-in fade-in duration-300">
+                                <h3 className="text-xl font-bold text-gray-900 font-serif mb-6">Change Password</h3>
+                                <form onSubmit={handlePasswordChange} className="space-y-6">
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-700 mb-2">Current Password</label>
+                                        <input
+                                            type="password"
+                                            value={passwordData.currentPassword}
+                                            onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                            required
+                                            className="w-full p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input"
+                                            placeholder="••••••••"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-2">New Password</label>
+                                            <input
+                                                type="password"
+                                                value={passwordData.newPassword}
+                                                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                                required
+                                                minLength={6}
+                                                className="w-full p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input"
+                                                placeholder="••••••••"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold text-gray-700 mb-2">Confirm New Password</label>
+                                            <input
+                                                type="password"
+                                                value={passwordData.confirmPassword}
+                                                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                                required
+                                                minLength={6}
+                                                className="w-full p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input"
+                                                placeholder="••••••••"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4 bg-orange-50 rounded-xl border border-orange-100 flex items-start gap-3">
+                                        <AlertCircle className="text-orange-600 shrink-0 mt-0.5" size={18} />
+                                        <div className="text-sm text-orange-800">
+                                            <span className="font-bold block mb-1">Security Note</span>
+                                            Changing your password will require you to log in again on other devices.
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end gap-3 pt-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setActiveTab('overview')}
+                                            className="px-6 py-3 text-gray-500 font-bold hover:bg-gray-50 rounded-xl transition-all"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={isSubmitting}
+                                            className="bg-black text-white px-8 py-3 rounded-xl font-bold hover:bg-brand hover:text-black transition-all flex items-center gap-2 shadow-lg disabled:opacity-70"
+                                        >
+                                            {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Save size={18} />}
+                                            Update Password
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

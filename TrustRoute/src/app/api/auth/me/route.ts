@@ -24,6 +24,8 @@ export async function GET() {
                 id: true,
                 email: true,
                 name: true,
+                phoneNumber: true,
+                createdAt: true,
             },
         });
 
