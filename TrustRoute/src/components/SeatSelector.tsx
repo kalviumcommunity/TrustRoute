@@ -43,33 +43,33 @@ export default function SeatSelector({ onSelect, onCancel, busName, price }: Sea
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col md:flex-row">
                 {/* Left: Seat Map */}
-                <div className="flex-1 p-8 overflow-y-auto bg-gray-50/50">
-                    <div className="flex items-center justify-between mb-8">
+                <div className="flex-1 p-6 md:p-8 overflow-y-auto bg-gray-50/50">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 md:mb-8 gap-4">
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900 font-serif">Select Your Seat</h2>
-                            <p className="text-gray-500 text-sm">{busName} • A/C Sleeper</p>
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-900 font-serif">Select Your Seat</h2>
+                            <p className="text-gray-400 md:text-gray-500 text-[10px] md:text-sm">{busName} • A/C Sleeper</p>
                         </div>
-                        <div className="flex gap-4 text-xs font-bold uppercase tracking-wider text-gray-400">
+                        <div className="flex flex-wrap gap-3 md:gap-4 text-[9px] md:text-xs font-bold uppercase tracking-wider text-gray-400">
                             <div className="flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-sm bg-white border border-gray-200" /> Available
+                                <span className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-sm bg-white border border-gray-200" /> Available
                             </div>
                             <div className="flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-sm bg-gray-200" /> Occupied
+                                <span className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-sm bg-gray-200" /> Occupied
                             </div>
                             <div className="flex items-center gap-1">
-                                <span className="w-3 h-3 rounded-sm bg-brand" /> Selected
+                                <span className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-sm bg-brand" /> Selected
                             </div>
                         </div>
                     </div>
 
                     {/* Bus Layout */}
-                    <div className="relative border-4 border-gray-200 rounded-3xl p-8 max-w-[300px] mx-auto bg-white shadow-inner">
+                    <div className="relative border-4 border-gray-200 rounded-2xl md:rounded-3xl p-6 md:p-8 max-w-[260px] md:max-w-[300px] mx-auto bg-white shadow-inner">
                         {/* Driver Seat */}
-                        <div className="absolute top-4 right-4 w-10 h-10 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center text-gray-200">
-                            <User size={20} />
+                        <div className="absolute top-3 md:top-4 right-3 md:right-4 w-8 h-8 md:w-10 md:h-10 border-2 border-dashed border-gray-200 rounded-lg flex items-center justify-center text-gray-200">
+                            <User size={16} />
                         </div>
 
-                        <div className="grid grid-cols-4 gap-4 mt-12">
+                        <div className="grid grid-cols-4 gap-3 md:gap-4 mt-8 md:mt-12">
                             {seats.map((seat, idx) => {
                                 const isOccupied = occupiedSeats.includes(seat);
                                 const isSelected = selectedSeat === seat;
@@ -78,12 +78,12 @@ export default function SeatSelector({ onSelect, onCancel, busName, price }: Sea
                                 return (
                                     <React.Fragment key={seat}>
                                         {/* Aisle Spacer after 2 seats */}
-                                        {idx % 4 === 2 && <div className="w-4" />}
+                                        {idx % 4 === 2 && <div className="w-2 md:w-4" />}
                                         <button
                                             onClick={() => handleSeatClick(seat)}
                                             disabled={isOccupied}
                                             className={`
-                                                relative w-10 h-10 rounded-lg font-bold text-xs transition-all
+                                                relative w-8 h-8 md:w-10 md:h-10 rounded-lg font-bold text-[10px] md:text-xs transition-all
                                                 flex items-center justify-center
                                                 ${isOccupied ? 'bg-gray-100 text-gray-300 cursor-not-allowed' :
                                                     isSelected ? 'bg-brand text-black shadow-lg scale-110 z-10' :
@@ -92,7 +92,7 @@ export default function SeatSelector({ onSelect, onCancel, busName, price }: Sea
                                         >
                                             {seat}
                                             {isBest && !isSelected && (
-                                                <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.6)]" />
+                                                <span className="absolute -top-1 -right-1 w-1.5 h-1.5 md:w-2 md:h-2 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.6)]" />
                                             )}
                                         </button>
                                     </React.Fragment>
@@ -103,79 +103,79 @@ export default function SeatSelector({ onSelect, onCancel, busName, price }: Sea
                 </div>
 
                 {/* Right: Passenger Info */}
-                <div className="w-full md:w-80 bg-white p-8 border-l border-gray-100 flex flex-col justify-between">
+                <div className="w-full md:w-80 bg-white p-6 md:p-8 border-t md:border-t-0 md:border-l border-gray-100 flex flex-col justify-between overflow-y-auto">
                     <div>
-                        <div className="mb-8">
-                            <h3 className="text-lg font-bold text-gray-900 mb-1">Passenger Details</h3>
-                            <p className="text-gray-400 text-sm italic">Enter name for the ticket</p>
+                        <div className="mb-6 md:mb-8">
+                            <h3 className="text-base md:text-lg font-bold text-gray-900 mb-1">Passenger Details</h3>
+                            <p className="text-gray-400 text-xs italic">Enter name for the ticket</p>
                         </div>
 
-                        <div className="space-y-6">
+                        <div className="space-y-4 md:space-y-6">
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Seat Selected</label>
-                                <div className="p-4 bg-brand/5 border border-brand/10 rounded-2xl flex items-center justify-between">
-                                    <span className="text-2xl font-bold text-brand">{selectedSeat || '--'}</span>
-                                    {selectedSeat && <Check className="text-brand" size={20} />}
+                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 md:mb-2">Seat Selected</label>
+                                <div className="p-3 md:p-4 bg-brand/5 border border-brand/10 rounded-xl md:rounded-2xl flex items-center justify-between">
+                                    <span className="text-xl md:text-2xl font-bold text-brand">{selectedSeat || '--'}</span>
+                                    {selectedSeat && <Check className="text-brand" size={18} />}
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Full Name</label>
+                                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 md:mb-2">Full Name</label>
                                 <input
                                     type="text"
                                     placeholder="Enter passenger name"
                                     value={passengerName}
                                     onChange={(e) => setPassengerName(e.target.value)}
-                                    className="w-full p-4 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand bg-gray-50/50"
+                                    className="w-full p-3 md:p-4 rounded-xl border border-gray-100 focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand bg-gray-50/50 text-sm"
                                 />
                             </div>
 
-                            <div className="p-4 bg-yellow-50 rounded-xl flex gap-3 border border-yellow-100">
-                                <Info className="text-yellow-600 shrink-0" size={18} />
-                                <p className="text-xs text-yellow-700 leading-relaxed font-medium">
+                            <div className="p-3 bg-yellow-50 rounded-xl flex gap-3 border border-yellow-100">
+                                <Info className="text-yellow-600 shrink-0" size={16} />
+                                <p className="text-[10px] md:text-xs text-yellow-700 leading-relaxed font-medium">
                                     <span className="font-bold">Pro Tip:</span> Yellow dots indicate seats with better views and extra legroom!
                                 </p>
                             </div>
 
-                            <div className="p-4 rounded-xl border border-gray-100 bg-gray-50/50">
-                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Refund Policy Preview</label>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-[11px]">
+                            <div className="p-3 md:p-4 rounded-xl border border-gray-100 bg-gray-50/50">
+                                <label className="block text-[9px] md:text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 md:mb-3">Refund Policy Preview</label>
+                                <div className="space-y-1.5 md:space-y-2">
+                                    <div className="flex justify-between text-[10px] md:text-[11px]">
                                         <span className="text-gray-500">{'>'}24 hrs</span>
                                         <span className="font-bold text-green-600">₹{(price * 0.95).toFixed(0)} back</span>
                                     </div>
-                                    <div className="flex justify-between text-[11px]">
+                                    <div className="flex justify-between text-[10px] md:text-[11px]">
                                         <span className="text-gray-500">12-24 hrs</span>
                                         <span className="font-bold text-yellow-600">₹{(price * 0.75).toFixed(0)} back</span>
                                     </div>
-                                    <div className="flex justify-between text-[11px]">
+                                    <div className="flex justify-between text-[10px] md:text-[11px]">
                                         <span className="text-gray-500">3-12 hrs</span>
                                         <span className="font-bold text-orange-600">₹{(price * 0.50).toFixed(0)} back</span>
                                     </div>
                                 </div>
                                 <label className="mt-4 flex items-center gap-2 cursor-pointer group">
-                                    <input type="checkbox" required className="rounded border-gray-300 text-brand focus:ring-brand" />
-                                    <span className="text-[10px] text-gray-500 font-medium group-hover:text-gray-700">I acknowledge the refund policy rules</span>
+                                    <input type="checkbox" required className="rounded border-gray-300 text-brand focus:ring-brand w-3 h-3" />
+                                    <span className="text-[9px] md:text-[10px] text-gray-500 font-medium group-hover:text-gray-700">I acknowledge the refund policy rules</span>
                                 </label>
                             </div>
                         </div>
                     </div>
 
-                    <div className="mt-10 space-y-3">
-                        <div className="flex justify-between items-center mb-4 px-1">
-                            <span className="text-gray-400 font-medium">Ticket Price</span>
-                            <span className="text-xl font-bold text-gray-900">₹{price}</span>
+                    <div className="mt-8 md:mt-10 space-y-3">
+                        <div className="flex justify-between items-center mb-3 md:mb-4 px-1">
+                            <span className="text-gray-400 font-medium text-sm">Ticket Price</span>
+                            <span className="text-lg md:text-xl font-bold text-gray-900">₹{price}</span>
                         </div>
                         <button
                             onClick={handleConfirm}
                             disabled={!selectedSeat || !passengerName.trim()}
-                            className="w-full bg-black text-white py-4 rounded-2xl font-bold hover:bg-brand hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                            className="w-full bg-black text-white py-3 md:py-4 rounded-xl md:rounded-2xl font-bold hover:bg-brand hover:text-black transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-sm md:text-base"
                         >
                             Review & Pay
                         </button>
                         <button
                             onClick={onCancel}
-                            className="w-full py-4 text-gray-400 font-bold hover:text-gray-600 transition-colors"
+                            className="w-full py-2 md:py-4 text-gray-400 font-bold hover:text-gray-600 transition-colors text-sm"
                         >
                             Change Bus
                         </button>

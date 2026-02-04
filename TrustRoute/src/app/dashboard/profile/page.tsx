@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { User, Settings, LogOut, ArrowLeft, Mail, Calendar, Phone, Edit2, Lock, Save, X, CheckCircle2, AlertCircle, Loader2, Bus, History } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import Navbar from '@/components/Navbar';
 
 export default function ProfilePage() {
     const router = useRouter();
@@ -151,27 +152,32 @@ export default function ProfilePage() {
                 </div>
             </aside>
 
-            <div className="md:ml-64 p-8">
+            <div className="md:ml-64 p-4 md:p-8 mb-24 md:mb-0">
+                <div className="md:hidden flex items-center gap-2 mb-6 text-brand">
+                    <Bus size={20} />
+                    <span className="text-xl font-bold font-serif italic">TrustRoute</span>
+                </div>
+
                 {/* Header */}
-                <header className="flex items-center justify-between mb-8 pt-4">
+                <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 pt-2 md:pt-4 gap-4">
                     <div>
-                        <h1 className="text-3xl font-serif font-bold text-gray-900 mb-2">Account Settings</h1>
-                        <p className="text-gray-500">Manage your personal information and security.</p>
+                        <h1 className="text-2xl md:text-3xl font-serif font-bold text-gray-900 mb-1 md:mb-2">Account Settings</h1>
+                        <p className="text-gray-500 text-sm md:text-base">Manage your personal information and security.</p>
                     </div>
                 </header>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                     {/* User Summary Card */}
                     <div className="lg:col-span-4">
-                        <div className="bg-white rounded-[2rem] shadow-sm border border-gray-200 p-8 text-center sticky top-8">
-                            <div className="w-32 h-32 bg-brand/10 rounded-full flex items-center justify-center mx-auto mb-6 text-brand font-bold text-4xl border-4 border-white shadow-lg">
+                        <div className="bg-white rounded-3xl md:rounded-[2rem] shadow-sm border border-gray-200 p-6 md:p-8 text-center sticky top-8">
+                            <div className="w-24 h-24 md:w-32 md:h-32 bg-brand/10 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 text-brand font-bold text-3xl md:text-4xl border-4 border-white shadow-lg">
                                 {user.name ? user.name[0].toUpperCase() : 'U'}
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-1">{user.name || 'User'}</h2>
-                            <p className="text-gray-500 text-sm mb-6">{user.email}</p>
+                            <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">{user.name || 'User'}</h2>
+                            <p className="text-gray-500 text-xs md:text-sm mb-4 md:mb-6">{user.email}</p>
 
-                            <div className="flex justify-center gap-2 mb-8">
-                                <span className="px-4 py-1.5 rounded-full bg-green-50 text-green-700 text-xs font-bold border border-green-100">
+                            <div className="flex justify-center gap-2 mb-6 md:mb-8">
+                                <span className="px-3 md:px-4 py-1.5 rounded-full bg-green-50 text-green-700 text-[10px] md:text-xs font-bold border border-green-100">
                                     Verified Account
                                 </span>
                             </div>
@@ -189,27 +195,27 @@ export default function ProfilePage() {
                     {/* Main Content Areas */}
                     <div className="lg:col-span-8">
                         {/* Tab Navigation */}
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-2 mb-8 flex gap-2">
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-1.5 md:p-2 mb-6 md:mb-8 flex flex-wrap md:flex-nowrap gap-1 md:gap-2">
                             <button
                                 onClick={() => setActiveTab('overview')}
-                                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'overview' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+                                className={`flex-1 min-w-[100px] py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'overview' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
                                     }`}
                             >
-                                <User size={18} /> Overview
+                                <User size={16} className="md:w-[18px] md:h-[18px]" /> Overview
                             </button>
                             <button
                                 onClick={() => setActiveTab('edit')}
-                                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'edit' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+                                className={`flex-1 min-w-[100px] py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'edit' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
                                     }`}
                             >
-                                <Edit2 size={18} /> Edit Profile
+                                <Edit2 size={16} className="md:w-[18px] md:h-[18px]" /> Edit
                             </button>
                             <button
                                 onClick={() => setActiveTab('security')}
-                                className={`flex-1 py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'security' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
+                                className={`flex-1 min-w-[100px] py-2.5 md:py-3 rounded-xl text-xs md:text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeTab === 'security' ? 'bg-black text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'
                                     }`}
                             >
-                                <Lock size={18} /> Security
+                                <Lock size={16} className="md:w-[18px] md:h-[18px]" /> Security
                             </button>
                         </div>
 
@@ -224,48 +230,48 @@ export default function ProfilePage() {
 
                         {/* Overview Tab */}
                         {activeTab === 'overview' && (
-                            <div className="bg-white rounded-[2rem] shadow-sm border border-gray-200 p-8 space-y-6 animate-in fade-in duration-300">
-                                <h3 className="text-xl font-bold text-gray-900 font-serif">Profile Details</h3>
+                            <div className="bg-white rounded-3xl md:rounded-[2rem] shadow-sm border border-gray-200 p-6 md:p-8 space-y-4 md:space-y-6 animate-in fade-in duration-300">
+                                <h3 className="text-lg md:text-xl font-bold text-gray-900 font-serif">Profile Details</h3>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="p-2 bg-white rounded-lg shadow-sm">
-                                                <User size={18} className="text-brand" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                                    <div className="p-3 md:p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <div className="flex items-center gap-3 mb-1.5 md:mb-2">
+                                            <div className="p-1.5 md:p-2 bg-white rounded-lg shadow-sm">
+                                                <User size={16} className="text-brand md:w-[18px] md:h-[18px]" />
                                             </div>
-                                            <p className="text-xs font-bold text-gray-400 uppercase">Full Name</p>
+                                            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase">Full Name</p>
                                         </div>
-                                        <p className="text-gray-900 font-bold ml-1">{user.name || 'Not provided'}</p>
+                                        <p className="text-gray-900 font-bold ml-1 text-sm md:text-base">{user.name || 'Not provided'}</p>
                                     </div>
 
-                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="p-2 bg-white rounded-lg shadow-sm">
-                                                <Mail size={18} className="text-brand" />
+                                    <div className="p-3 md:p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <div className="flex items-center gap-3 mb-1.5 md:mb-2">
+                                            <div className="p-1.5 md:p-2 bg-white rounded-lg shadow-sm">
+                                                <Mail size={16} className="text-brand md:w-[18px] md:h-[18px]" />
                                             </div>
-                                            <p className="text-xs font-bold text-gray-400 uppercase">Email Address</p>
+                                            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase">Email Address</p>
                                         </div>
-                                        <p className="text-gray-900 font-bold ml-1">{user.email}</p>
+                                        <p className="text-gray-900 font-bold ml-1 text-sm md:text-base truncate">{user.email}</p>
                                     </div>
 
-                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="p-2 bg-white rounded-lg shadow-sm">
-                                                <Phone size={18} className="text-brand" />
+                                    <div className="p-3 md:p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <div className="flex items-center gap-3 mb-1.5 md:mb-2">
+                                            <div className="p-1.5 md:p-2 bg-white rounded-lg shadow-sm">
+                                                <Phone size={16} className="text-brand md:w-[18px] md:h-[18px]" />
                                             </div>
-                                            <p className="text-xs font-bold text-gray-400 uppercase">Phone Number</p>
+                                            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase">Phone Number</p>
                                         </div>
-                                        <p className="text-gray-900 font-bold ml-1">{user.phoneNumber || 'Not provided'}</p>
+                                        <p className="text-gray-900 font-bold ml-1 text-sm md:text-base">{user.phoneNumber || 'Not provided'}</p>
                                     </div>
 
-                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="p-2 bg-white rounded-lg shadow-sm">
-                                                <Calendar size={18} className="text-brand" />
+                                    <div className="p-3 md:p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <div className="flex items-center gap-3 mb-1.5 md:mb-2">
+                                            <div className="p-1.5 md:p-2 bg-white rounded-lg shadow-sm">
+                                                <Calendar size={16} className="text-brand md:w-[18px] md:h-[18px]" />
                                             </div>
-                                            <p className="text-xs font-bold text-gray-400 uppercase">Member Since</p>
+                                            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase">Member Since</p>
                                         </div>
-                                        <p className="text-gray-900 font-bold ml-1">
+                                        <p className="text-gray-900 font-bold ml-1 text-sm md:text-base">
                                             {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
                                                 year: 'numeric',
                                                 month: 'long',
@@ -279,48 +285,48 @@ export default function ProfilePage() {
 
                         {/* Edit Tab */}
                         {activeTab === 'edit' && (
-                            <div className="bg-white rounded-[2rem] shadow-sm border border-gray-200 p-8 animate-in fade-in duration-300">
-                                <h3 className="text-xl font-bold text-gray-900 font-serif mb-6">Update Information</h3>
-                                <form onSubmit={handleProfileUpdate} className="space-y-6">
+                            <div className="bg-white rounded-3xl md:rounded-[2rem] shadow-sm border border-gray-200 p-6 md:p-8 animate-in fade-in duration-300">
+                                <h3 className="text-lg md:text-xl font-bold text-gray-900 font-serif mb-4 md:mb-6">Update Information</h3>
+                                <form onSubmit={handleProfileUpdate} className="space-y-4 md:space-y-6">
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">Full Name</label>
+                                        <label className="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">Full Name</label>
                                         <input
                                             type="text"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            className="w-full p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input"
+                                            className="w-full p-3 md:p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input text-sm"
                                             placeholder="Enter your name"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">Phone Number</label>
+                                        <label className="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">Phone Number</label>
                                         <input
                                             type="tel"
                                             value={formData.phoneNumber}
                                             onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                                            className="w-full p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input"
+                                            className="w-full p-3 md:p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input text-sm"
                                             placeholder="Enter your phone number"
                                             pattern="[0-9]{10}"
                                             title="10 digit phone number"
                                         />
-                                        <p className="text-xs text-gray-400 mt-2 ml-1">Must be a valid 10-digit number</p>
+                                        <p className="text-[10px] text-gray-400 mt-2 ml-1">Must be a valid 10-digit number</p>
                                     </div>
 
-                                    <div className="flex justify-end gap-3 pt-4">
+                                    <div className="flex justify-end gap-3 pt-3 md:pt-4">
                                         <button
                                             type="button"
                                             onClick={() => setActiveTab('overview')}
-                                            className="px-6 py-3 text-gray-500 font-bold hover:bg-gray-50 rounded-xl transition-all"
+                                            className="px-4 md:px-6 py-2.5 md:py-3 text-gray-500 font-bold hover:bg-gray-50 rounded-xl transition-all text-sm"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={isSubmitting}
-                                            className="bg-black text-white px-8 py-3 rounded-xl font-bold hover:bg-brand hover:text-black transition-all flex items-center gap-2 shadow-lg disabled:opacity-70"
+                                            className="bg-black text-white px-6 md:px-8 py-2.5 md:py-3 rounded-xl font-bold hover:bg-brand hover:text-black transition-all flex items-center gap-2 shadow-lg disabled:opacity-70 text-sm"
                                         >
-                                            {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Save size={18} />}
+                                            {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Save size={16} />}
                                             Save Changes
                                         </button>
                                     </div>
@@ -330,70 +336,70 @@ export default function ProfilePage() {
 
                         {/* Security Tab */}
                         {activeTab === 'security' && (
-                            <div className="bg-white rounded-[2rem] shadow-sm border border-gray-200 p-8 animate-in fade-in duration-300">
-                                <h3 className="text-xl font-bold text-gray-900 font-serif mb-6">Change Password</h3>
-                                <form onSubmit={handlePasswordChange} className="space-y-6">
+                            <div className="bg-white rounded-3xl md:rounded-[2rem] shadow-sm border border-gray-200 p-6 md:p-8 animate-in fade-in duration-300">
+                                <h3 className="text-lg md:text-xl font-bold text-gray-900 font-serif mb-4 md:mb-6">Change Password</h3>
+                                <form onSubmit={handlePasswordChange} className="space-y-4 md:space-y-6">
                                     <div>
-                                        <label className="block text-sm font-bold text-gray-700 mb-2">Current Password</label>
+                                        <label className="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">Current Password</label>
                                         <input
                                             type="password"
                                             value={passwordData.currentPassword}
                                             onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
                                             required
-                                            className="w-full p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input"
+                                            className="w-full p-3 md:p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input text-sm"
                                             placeholder="••••••••"
                                         />
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-bold text-gray-700 mb-2">New Password</label>
+                                            <label className="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">New Password</label>
                                             <input
                                                 type="password"
                                                 value={passwordData.newPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                                                 required
                                                 minLength={6}
-                                                className="w-full p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input"
+                                                className="w-full p-3 md:p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input text-sm"
                                                 placeholder="••••••••"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-gray-700 mb-2">Confirm New Password</label>
+                                            <label className="block text-xs md:text-sm font-bold text-gray-700 mb-1.5 md:mb-2">Confirm New Password</label>
                                             <input
                                                 type="password"
                                                 value={passwordData.confirmPassword}
                                                 onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
                                                 required
                                                 minLength={6}
-                                                className="w-full p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input"
+                                                className="w-full p-3 md:p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input text-sm"
                                                 placeholder="••••••••"
                                             />
                                         </div>
                                     </div>
 
-                                    <div className="p-4 bg-orange-50 rounded-xl border border-orange-100 flex items-start gap-3">
-                                        <AlertCircle className="text-orange-600 shrink-0 mt-0.5" size={18} />
-                                        <div className="text-sm text-orange-800">
-                                            <span className="font-bold block mb-1">Security Note</span>
+                                    <div className="p-3 md:p-4 bg-orange-50 rounded-xl border border-orange-100 flex items-start gap-3">
+                                        <AlertCircle className="text-orange-600 shrink-0 mt-0.5" size={16} />
+                                        <div className="text-[11px] md:text-sm text-orange-800">
+                                            <span className="font-bold block mb-0.5 md:mb-1">Security Note</span>
                                             Changing your password will require you to log in again on other devices.
                                         </div>
                                     </div>
 
-                                    <div className="flex justify-end gap-3 pt-4">
+                                    <div className="flex justify-end gap-3 pt-3 md:pt-4">
                                         <button
                                             type="button"
                                             onClick={() => setActiveTab('overview')}
-                                            className="px-6 py-3 text-gray-500 font-bold hover:bg-gray-50 rounded-xl transition-all"
+                                            className="px-4 md:px-6 py-2.5 md:py-3 text-gray-500 font-bold hover:bg-gray-50 rounded-xl transition-all text-sm"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             type="submit"
                                             disabled={isSubmitting}
-                                            className="bg-black text-white px-8 py-3 rounded-xl font-bold hover:bg-brand hover:text-black transition-all flex items-center gap-2 shadow-lg disabled:opacity-70"
+                                            className="bg-black text-white px-6 md:px-8 py-2.5 md:py-3 rounded-xl font-bold hover:bg-brand hover:text-black transition-all flex items-center gap-2 shadow-lg disabled:opacity-70 text-sm"
                                         >
-                                            {isSubmitting ? <Loader2 className="animate-spin" size={20} /> : <Save size={18} />}
+                                            {isSubmitting ? <Loader2 className="animate-spin" size={18} /> : <Save size={16} />}
                                             Update Password
                                         </button>
                                     </div>
@@ -401,6 +407,10 @@ export default function ProfilePage() {
                             </div>
                         )}
                     </div>
+                </div>
+                {/* Floating Navbar (Consistency with Dashboard) */}
+                <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+                    <Navbar />
                 </div>
             </div>
         </div>
