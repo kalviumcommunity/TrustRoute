@@ -19,13 +19,23 @@ export async function PATCH(request: Request) {
 
         const { name, phoneNumber } = await request.json();
 
-        // Basic validation
-        if (name && name.length < 2) {
-            return NextResponse.json({ error: 'Name must be at least 2 characters long' }, { status: 400 });
+        // Enhanced validation
+        const errors = [];
+
+        if (name && name.trim().length < 2) {
+            errors.push('Name must be at least 2 characters long');
         }
 
-        if (phoneNumber && !/^\d{10}$/.test(phoneNumber)) {
-            return NextResponse.json({ error: 'Invalid phone number format' }, { status: 400 });
+        // Validate phone number if provided (keeping it optional based on schema, but strict if provided)
+        if (phoneNumber) {
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(phoneNumber)) {
+                errors.push('Phone number must be exactly 10 digits');
+            }
+        }
+
+        if (errors.length > 0) {
+            return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
         }
 
         const updatedUser = await prisma.user.update({

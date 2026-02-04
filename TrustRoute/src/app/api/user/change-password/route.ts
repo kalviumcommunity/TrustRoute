@@ -27,6 +27,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'New password must be at least 6 characters long' }, { status: 400 });
         }
 
+        if (currentPassword === newPassword) {
+            return NextResponse.json({ error: 'New password cannot be the same as the current password' }, { status: 400 });
+        }
+
         const user = await prisma.user.findUnique({
             where: { id: decoded.userId },
         });
