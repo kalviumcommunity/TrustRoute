@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-// Force recompile to clear stale Turbopack cache - v2
+// Force recompile to clear stale Turbopack cache - v3
 import { PrismaPg } from '@prisma/adapter-pg'
 import { Pool } from 'pg'
 

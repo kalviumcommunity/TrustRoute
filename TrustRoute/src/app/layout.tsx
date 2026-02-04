@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 import { AuthProvider } from "@/context/AuthContext";
+import Chatbot from "@/components/Chatbot";
 
 export default function RootLayout({
   children,
@@ -31,8 +32,10 @@ export default function RootLayout({
       >
         <AuthProvider>
           {children}
+          <Chatbot />
         </AuthProvider>
       </body>
     </html>
   );
 }
+
