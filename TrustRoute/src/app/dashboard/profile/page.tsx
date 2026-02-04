@@ -58,7 +58,7 @@ export default function ProfilePage() {
                 setMessage({ type: 'error', text: data.error || 'Failed to update profile' });
             }
         } catch (error) {
-            setMessage({ type: 'error', text: 'Something went wrong. Please try again.' });
+            setMessage({ type: 'error', text: 'Something went wrong. Please check your network and try again.' });
         } finally {
             setIsSubmitting(false);
         }
@@ -70,6 +70,16 @@ export default function ProfilePage() {
 
         if (passwordData.newPassword !== passwordData.confirmPassword) {
             setMessage({ type: 'error', text: 'New passwords do not match' });
+            return;
+        }
+
+        if (passwordData.currentPassword === passwordData.newPassword) {
+            setMessage({ type: 'error', text: 'New password cannot be the same as your current password' });
+            return;
+        }
+
+        if (passwordData.newPassword.length < 6) {
+            setMessage({ type: 'error', text: 'New password must be at least 6 characters long' });
             return;
         }
 
@@ -304,13 +314,23 @@ export default function ProfilePage() {
                                         <input
                                             type="tel"
                                             value={formData.phoneNumber}
-                                            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                                            onChange={(e) => {
+                                                const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                                                setFormData({ ...formData, phoneNumber: val });
+                                            }}
                                             className="w-full p-3 md:p-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand form-input text-sm"
-                                            placeholder="Enter your phone number"
+                                            placeholder="Enter 10 digit number"
                                             pattern="[0-9]{10}"
                                             title="10 digit phone number"
                                         />
-                                        <p className="text-[10px] text-gray-400 mt-2 ml-1">Must be a valid 10-digit number</p>
+                                        <div className="flex justify-between items-center mt-2 ml-1">
+                                            <p className="text-xs text-gray-500">Must be a valid 10-digit number</p>
+                                            {formData.phoneNumber.length > 0 && formData.phoneNumber.length < 10 && (
+                                                <span className="text-xs text-orange-600 font-medium">
+                                                    {10 - formData.phoneNumber.length} digits remaining
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
 
                                     <div className="flex justify-end gap-3 pt-3 md:pt-4">
