@@ -38,25 +38,23 @@ export async function POST(request: Request) {
         });
 
         // Read Policy Details
-        // The file is at /Users/sriman/Developer/Projects/TrustRoute/docs/REFUND_POLICY.md
-        // The code is at /Users/sriman/Developer/Projects/TrustRoute/TrustRoute/src/app/api/chat/route.ts
-        // In local dev, process.cwd() is /Users/sriman/Developer/Projects/TrustRoute/TrustRoute
-        const policyPath = path.join(process.cwd(), '..', 'docs', 'REFUND_POLICY.md');
-        let policyContent = '';
-        try {
-            if (fs.existsSync(policyPath)) {
-                policyContent = fs.readFileSync(policyPath, 'utf-8');
-            } else {
-                // Try alternate path if first fails
-                const altPath = path.join(process.cwd(), 'docs', 'REFUND_POLICY.md');
-                if (fs.existsSync(altPath)) {
-                    policyContent = fs.readFileSync(altPath, 'utf-8');
-                } else {
-                    policyContent = "Refund Policy: 95% refund if >24hrs, 75% if 12-24hrs, 50% if 3-12hrs, 0% if <3hrs. Timeline: 1-2 days processing, 3-5 days credit.";
+        const possiblePaths = [
+            path.join(process.cwd(), '..', 'docs', 'REFUND_POLICY.md'),
+            path.join(process.cwd(), 'docs', 'REFUND_POLICY.md'),
+            path.join(process.cwd(), 'public', 'docs', 'REFUND_POLICY.md'),
+        ];
+
+        let policyContent = "Refund Policy: 95% refund if >24hrs, 75% if 12-24hrs, 50% if 3-12hrs, 0% if <3hrs. Timeline: 1-2 days processing, 3-5 days credit.";
+
+        for (const p of possiblePaths) {
+            try {
+                if (fs.existsSync(p)) {
+                    policyContent = fs.readFileSync(p, 'utf-8');
+                    break;
                 }
+            } catch (e) {
+                // Continue to next path
             }
-        } catch (e) {
-            policyContent = "Refund Policy: 95% refund if >24hrs, 75% if 12-24hrs, 50% if 3-12hrs, 0% if <3hrs. Timeline: 1-2 days processing, 3-5 days credit.";
         }
 
         // Prepare context

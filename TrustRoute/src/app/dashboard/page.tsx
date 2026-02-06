@@ -59,10 +59,35 @@ export default function DashboardPage() {
     const [showRefundReceipt, setShowRefundReceipt] = useState(false);
     const [activeBooking, setActiveBooking] = useState<any>(null);
     const [cancellingId, setCancellingId] = useState<string | null>(null);
+    const [refundPreview, setRefundPreview] = useState<any>(null);
+    const [loadingPreview, setLoadingPreview] = useState(false);
 
     useEffect(() => {
         fetchBookings();
     }, []);
+
+    useEffect(() => {
+        if (cancellingId) {
+            fetchRefundPreview(cancellingId);
+        } else {
+            setRefundPreview(null);
+        }
+    }, [cancellingId]);
+
+    const fetchRefundPreview = async (bookingId: string) => {
+        setLoadingPreview(true);
+        try {
+            const res = await fetch(`/api/bookings/${bookingId}/cancel`);
+            const data = await res.json();
+            if (data.refund) {
+                setRefundPreview(data.refund);
+            }
+        } catch (error) {
+            console.error('Failed to fetch refund preview', error);
+        } finally {
+            setLoadingPreview(false);
+        }
+    };
 
     const fetchBookings = async () => {
         try {
@@ -292,21 +317,24 @@ export default function DashboardPage() {
                             <p className="text-gray-500 text-xs md:text-sm leading-relaxed">
                                 Are you sure you want to cancel your journey? Refunds are calculated strictly based on TrustRoute's policy.
                             </p>
-                            <div className="p-4 bg-orange-50 border border-orange-100 rounded-xl md:rounded-2xl">
+                            <div className="p-4 bg-orange-50 border border-orange-100 rounded-xl md:rounded-2xl min-h-[80px] flex flex-col justify-center">
                                 <p className="text-[10px] font-bold text-orange-800 uppercase mb-1.5 md:mb-2">Refund Estimate</p>
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-xs md:text-sm font-medium text-orange-700">Estimated Refund</span>
-                                    <span className="font-bold text-orange-900 text-lg md:text-xl font-serif">₹{(() => {
-                                        const b = bookings.find(b => b.id === cancellingId);
-                                        if (!b) return 0;
-                                        const diff = (new Date(b.travelDate || b.createdAt).getTime() - new Date().getTime()) / (1000 * 3600);
-                                        if (diff >= 24) return (b.amount * 0.95).toFixed(0);
-                                        if (diff >= 12) return (b.amount * 0.75).toFixed(0);
-                                        if (diff >= 3) return (b.amount * 0.50).toFixed(0);
-                                        return 0;
-                                    })()}</span>
-                                </div>
-                                <p className="text-[9px] md:text-[10px] text-orange-600 font-medium">*Final calculation at time of initiation</p>
+                                {loadingPreview ? (
+                                    <div className="flex items-center gap-2 text-orange-600">
+                                        <Loader2 className="animate-spin" size={16} />
+                                        <span className="text-xs font-medium">Calculating...</span>
+                                    </div>
+                                ) : refundPreview ? (
+                                    <>
+                                        <div className="flex justify-between items-center mb-1">
+                                            <span className="text-xs md:text-sm font-medium text-orange-700">Estimated Refund</span>
+                                            <span className="font-bold text-orange-900 text-lg md:text-xl font-serif">₹{refundPreview.refundAmount}</span>
+                                        </div>
+                                        <p className="text-[9px] md:text-[10px] text-orange-600 font-medium">*{refundPreview.appliedSlab.label}</p>
+                                    </>
+                                ) : (
+                                    <p className="text-xs text-orange-600 font-medium italic">Unable to fetch estimate. Final refund will be calculated upon cancellation.</p>
+                                )}
                             </div>
                         </div>
                         <div className="flex gap-4 font-bold text-sm md:text-base">

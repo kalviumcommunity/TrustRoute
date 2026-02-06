@@ -25,8 +25,12 @@ export async function GET() {
 
     try {
         // Check Redis
-        await redis.ping()
-        healthStatus.services.redis = 'ok'
+        if (redis) {
+            await redis.ping()
+            healthStatus.services.redis = 'ok'
+        } else {
+            healthStatus.services.redis = 'disabled'
+        }
     } catch (error) {
         healthStatus.services.redis = 'error'
         healthStatus.status = 'error'

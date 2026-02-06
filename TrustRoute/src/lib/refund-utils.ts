@@ -32,7 +32,7 @@ export function calculateRefund(amount: number, departureTime: Date, currentTime
     // Breakdown logic for receipt
     // As per policy.md: Convenience fee (5%) + Cancellation fee (rest)
     const convenienceFee = (amount * 5) / 100;
-    const cancellationFee = Math.max(0, deductionTotal - (diffHrs >= 24 ? 0 : 0)); // Policy says "5% covers processing" for 24h+
+    const cancellationFee = Math.max(0, deductionTotal - convenienceFee);
 
     // Refined breakdown per policy.md
     const breakdown = {
