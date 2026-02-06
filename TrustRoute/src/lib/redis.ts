@@ -2,7 +2,8 @@ import Redis from 'ioredis'
 
 const redisClientSingleton = () => {
     if (!process.env.REDIS_URL) {
-        throw new Error('REDIS_URL is not defined')
+        console.warn('REDIS_URL is not defined. Redis features will be disabled.');
+        return null;
     }
     return new Redis(process.env.REDIS_URL)
 }

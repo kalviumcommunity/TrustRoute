@@ -180,6 +180,7 @@ export default function Chatbot() {
                                         <Loader2 size={16} className="animate-spin text-brand" />
                                         <span className="text-xs text-gray-400 font-medium italic">TrustRoute AI is thinking...</span>
                                     </div>
+                                    <p className="text-[10px] text-gray-500 font-medium mt-2 px-1">I&apos;m an AI and can make mistakes. Please check the final refund breakdown in your dashboard.</p>
                                 </div>
                             </div>
                         )}

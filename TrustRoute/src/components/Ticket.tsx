@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Bus, MapPin, Calendar, User, Download, CheckCircle2, QrCode, ArrowRight } from 'lucide-react';
+import { Bus, Calendar, User, Download, CheckCircle2, QrCode, ArrowRight } from 'lucide-react';
 
 interface TicketProps {
     booking: {
@@ -61,7 +61,7 @@ Transparency First.
                             <CheckCircle2 size={24} className="md:w-8 md:h-8" />
                         </div>
                         <h2 className="text-xl md:text-2xl font-bold font-serif italic">Payment Successful!</h2>
-                        <p className="text-white/80 text-xs md:text-sm mt-1">Pack your bags, you're ready to go.</p>
+                        <p className="text-white/80 text-xs md:text-sm mt-1">Pack your bags, you&apos;re ready to go.</p>
                     </div>
                 </div>
 
